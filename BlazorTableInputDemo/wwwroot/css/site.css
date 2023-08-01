@@ -1,5 +1,14 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+.entereddata {
+    color: fuchsia;
+    background-color: yellow;
+}
+
+.defaultdata {
+    background-color: beige;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
