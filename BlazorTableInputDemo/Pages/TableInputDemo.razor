@@ -13,6 +13,20 @@
 
     <table id="mytable" class="bbd-table">
 
+        <thead>
+            <tr>
+                <td></td>
+               
+            @for (int col = 1; col < 5; col++)
+                {
+                <td>
+                @CellsListOfLists[0][col].Index_Col
+                </td>
+                }
+                
+            </tr>
+        </thead>
+
         <tbody>
 
             @for (int row = 0; row <= 10; row++)
@@ -32,26 +46,44 @@
                             {
                             <td class="@cell.CSSClass" contenteditable="false" style="width: @colWidth">
                                 <input style="width:@colWidth"
-                                       class="@cell.CSSClass"
-                                       value="@cell.Value_Formatted"
-                                       placeholder=""
-                                       onFocus="this.select()"
-                           @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, yearIndex, colIndex))"
-                           @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, yearIndex, colIndex))"
-                           @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, yearIndex, colIndex))" />
+                                    class="@cell.CSSClass"
+                                    value="@cell.Value_Formatted"
+                                    placeholder=""
+                                    onFocus="this.select()"
+                                    @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))"
+                                    @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
+                                    @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))" />
                             </td>
                             }
                         else
                             {
                             <td class="@cell.CSSClass" contenteditable="false" style="width: @colWidth">
-                                <input style="width:@colWidth"
-                                       class="@cell.CSSClass"
-                                       value=""
-                                       placeholder="@cell.Value_Formatted"
-                                       onFocus="this.select()"
-                           @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, yearIndex, colIndex))"
-                           @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, yearIndex, colIndex))"
-                           @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, yearIndex, colIndex))" />
+
+                                @* Adding this if gets around the problem as described (i.e. an entered value does not appear in the "next" cell 
+                                following the one in which the value is entered, even though the input statements below are identical. Based on the
+                                Focus events, it appears this hack causes a FocusOut on the "next" cell after the value is entered. *@
+                                @if (colIndex%2 == 0)
+                                    {
+                                    <input style="width:@colWidth"
+                                        class="@cell.CSSClass"
+                                        value=""
+                                        placeholder="@cell.Value_Formatted"
+                                        onFocus="this.select()"
+                                        @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))"
+                                        @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
+                                        @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))" />
+                                    }
+                                else
+                                    {
+                                    <input style="width:@colWidth"
+                                        class="@cell.CSSClass"
+                                        value=""
+                                        placeholder="@cell.Value_Formatted"
+                                        onFocus="this.select()"
+                                        @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))"
+                                        @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
+                                        @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))" />
+                                    }
                             </td>
                             }
 
@@ -68,12 +100,15 @@
 
 @code
 {
+    ElementReference nextElem;
+    // private bool toggle = false;
+
     private List<List<TableCell>> CellsListOfLists { get; set; } = new List<List<TableCell>>();
     private string colWidth = "75px";
     private string enteredData = "entereddata";
     private string defaultData = "defaultdata";
     private int count = 0;
-    private TableCell lastCell;
+    private TableCell lastCell = new TableCell();
 
     protected override void OnInitialized()
         {
@@ -118,6 +153,8 @@
         {
         lastCell = CellsListOfLists[year][colIndex];
         count++;
+
+        // var x0 = nextElem.Context;
 
         lastCell.CSSClass = enteredData;
         lastCell.Value_Dec = int.Parse((string)e.Value);
