@@ -60,9 +60,12 @@
                             <td class="@cell.CSSClass" contenteditable="false" style="width: @colWidth">
 
                                 @* Adding this if gets around the problem as described (i.e. an entered value does not appear in the "next" cell 
-                                following the one in which the value is entered, even though the input statements below are identical. Based on the
-                                Focus events, it appears this hack causes a FocusOut on the "next" cell after the value is entered. *@
-                                @if (colIndex%2 == 0)
+                                following the one in which the value is entered), even though the input statements below are identical. Based on the
+                                Focus events, it appears this hack causes a FocusOut on the "next" cell after the value is entered. 
+                                
+                                Remove the "true ||" condition in the if statement to see the workaround.*@
+
+                                @if (true || colIndex%2 == 0)
                                     {
                                     <input style="width:@colWidth"
                                         class="@cell.CSSClass"
