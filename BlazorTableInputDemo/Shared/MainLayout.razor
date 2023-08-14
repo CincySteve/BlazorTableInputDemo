@@ -9,44 +9,48 @@
 <table id="mytable" class="bbd-table">
     <tbody>
 
-        @for (int row = 0; row <= 7; row++)
+        @for (int row = 0; row <= 5; row++)
             {
             <tr>
 
-                @for (int col = 1; col < 5; col++)
+                @for (int col = 0; col < 5; col++)
                     {
                     TableCell cell = CellsListOfLists[row][col];
 
-                    @if (cell.CSSClass == enteredData)
+                    @* Making this "if" false makes the table behave entirely as expected. .
+                        Switch the if statements to see how the behavior changes.*@
+                    
+                    @if (cell.CSSClass == userData)
+                    @* @if (false) *@
                         {
-                        <td class="@cell.CSSClass" contenteditable="false" >
-                            <input class="@cell.CSSClass" value="@cell.Value_Formatted"
-                            @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))"
-                            @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
-                            @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))" />
+                        <td contenteditable="false" class="@cell.CSSClass">
+                            <input class="@cell.CSSClass" value="@cell.Value"
+                                @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Index_Row, cell.Index_Col))"
+                                @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
+                                @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Index_Row, cell.Index_Col))" />
                         </td>
                         }
                     else
                         {
-                        <td class="@cell.CSSClass" contenteditable="false" >
+                        <td contenteditable="false" class="@cell.CSSClass">
 
-                            @* Adding the even/odd col "if/else" gets around the problem as described, even though the input statements are the same.
-                            Switch the if statement to see the behavior with and without the workaround.*@
+                            @* Adding the even/odd col "if/else" changes the behavior, even though the 2 input statements are the same.
+                                Switch the if statement to see the behavior with and without the even/odd col logic.*@
 
-                            @* @if (colIndex % 2 == 0) *@
+                            @* @if (col % 2 == 0) *@
                             @if (true)
                                 {
-                                <input class="@cell.CSSClass" placeholder="@cell.Value_Formatted"
-                                @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))"
-                                @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
-                                @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))" />
+                                <input class="@cell.CSSClass" placeholder="@cell.Value"
+                                    @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Index_Row, cell.Index_Col))"
+                                    @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
+                                    @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Index_Row, cell.Index_Col))" />
                                 }
                             else
                                 {
-                                <input class="@cell.CSSClass" placeholder="@cell.Value_Formatted"
-                                @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))"
-                                @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
-                                @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Value_Formatted, cell.Index_Row, cell.Index_Col))" />
+                                <input class="@cell.CSSClass" placeholder="@cell.Value"
+                                    @onchange="@((ChangeEventArgs e) => OnChange(e, cell.Index_Row, cell.Index_Col))"
+                                    @onfocusin="@((FocusEventArgs e) => OnFocusIn(e, cell.Index_Row, cell.Index_Col))"
+                                    @onfocusout="@((FocusEventArgs e) => OnFocusOut(e, cell.Index_Row, cell.Index_Col))" />
                                 }
                         </td>
                         }
@@ -62,23 +66,17 @@
 
 @code
 {
-    // onFocus="this.select()"
-
-    ElementReference nextElem;
-    // private bool toggle = false;
-
     private List<List<TableCell>> CellsListOfLists { get; set; } = new List<List<TableCell>>();
-    private string enteredData = "entereddata";
+    private string userData = "userdata";
     private string defaultData = "defaultdata";
-    private int count = 0;
     private TableCell lastCell = new TableCell();
 
     protected override void OnInitialized()
         {
+        // Create the data that will populte the table
         CellsListOfLists = new List<List<TableCell>>();
 
-        // Create some data
-        for (int rowIndex = 0; rowIndex <= 7; rowIndex++)
+        for (int rowIndex = 0; rowIndex <= 5; rowIndex++)
             {
             List<TableCell> rowCellList = new List<TableCell>();
 
@@ -87,59 +85,49 @@
                 TableCell cell = new TableCell();
                 cell.Index_Row = rowIndex;
                 cell.Index_Col = colIndex;
-                cell.ColName = $"Col_{colIndex}";
-                cell.Value_Dec = (rowIndex + 1) * 10 + colIndex;
-                cell.Value_Formatted = cell.Value_Dec.ToString("C0");
-                cell.CSSClass = "defaultdata";
-
+                cell.CSSClass = defaultData;
+                cell.Value = ((rowIndex + 1) * 10 + colIndex).ToString("C0");
                 rowCellList.Add(cell);
                 } // next colSpec
 
             CellsListOfLists.Add(rowCellList);
-            }
+            } // next rowIndex
 
-        // Make a couple of the cells entered data
-        CellsListOfLists[3][3].CSSClass = enteredData;
-        CellsListOfLists[3][4].CSSClass = enteredData;
+        // Randomly make 2 cells user data
+        CellsListOfLists[2][2].CSSClass = userData;
+        CellsListOfLists[2][3].CSSClass = userData;
 
-        lastCell = CellsListOfLists[5][2];
-        Debug.WriteLine($"\nOnInitialized: Row/Col(5/5) | Formatted({lastCell.Value_Formatted})");
+        lastCell = CellsListOfLists[0][0];
         } // OnInitialized
 
     protected override async Task OnAfterRenderAsync(bool firstTime)
         {
-        Debug.WriteLine($"{count.ToString("0000")} OnAfterRenderAsync: Row/Col({lastCell.Index_Row}/{lastCell.Index_Col}) "
-       + $"| Dec Value({lastCell.Value_Dec}) | Formatted({lastCell.Value_Formatted})");
+        Debug.WriteLine($"OnAfterRenderAsync: Row/Col({lastCell.Index_Row}/{lastCell.Index_Col}) | Value({lastCell.Value})");
         }
 
-    protected void OnChange(ChangeEventArgs e, string origFormattedValue, int year, int colIndex)
+    protected void OnChange(ChangeEventArgs e, int rowIndex, int colIndex)
         {
-        lastCell = CellsListOfLists[year][colIndex];
-        count++;
+        lastCell = CellsListOfLists[rowIndex][colIndex];
+        string origValue = lastCell.Value;
 
-        lastCell.CSSClass = enteredData;
-        lastCell.Value_Dec = int.Parse((string)e.Value);
-        lastCell.Value_Formatted = lastCell.Value_Dec.ToString("C0");
-        Debug.WriteLine($"{count.ToString("0000")} OnChange: Row/Col({lastCell.Index_Row}/{lastCell.Index_Col}) "
-        + $"| Orig Value({origFormattedValue}) | New Value({(string)e.Value}) ");
+        lastCell.CSSClass = userData;
+        lastCell.Value = (int.Parse((string)e.Value)).ToString("C0");
+        
+        Debug.WriteLine($"OnChange: Row/Col({rowIndex}/{colIndex}) | Orig Value({origValue}) | New Value({(string)e.Value}) ");
         } // OnChange
 
-    protected void OnFocusIn(FocusEventArgs e, int year, int colIndex)
+    protected void OnFocusIn(FocusEventArgs e, int rowIndex, int colIndex)
         {
-        lastCell = CellsListOfLists[year][colIndex];
-        count++;
+        lastCell = CellsListOfLists[rowIndex][colIndex];
 
-        Debug.WriteLine($"{count.ToString("0000")} OnFocusIn: Row/Col({lastCell.Index_Row}/{lastCell.Index_Col}) "
-        + $"| Dec Value({lastCell.Value_Dec}) | Formatted({lastCell.Value_Formatted})");
+        Debug.WriteLine($"OnFocusIn: Row/Col({rowIndex}/{colIndex}) | Value({lastCell.Value}) ");
         } // OnFocusIn
 
-    protected void OnFocusOut(FocusEventArgs e, string value, int year, int colIndex)
+    protected void OnFocusOut(FocusEventArgs e, int rowIndex, int colIndex)
         {
-        lastCell = CellsListOfLists[year][colIndex];
-        count++;
+        lastCell = CellsListOfLists[rowIndex][colIndex];
 
-        Debug.WriteLine($"{count.ToString("0000")} OnFocusOut: Row/Col({lastCell.Index_Row}/{lastCell.Index_Col}) "
-            + $"| Dec Value({lastCell.Value_Dec}) | Formatted({lastCell.Value_Formatted})");
+        Debug.WriteLine($"OnFocusOut: Row/Col({rowIndex}/{colIndex}) | Value({lastCell.Value})");
         } // OnFocusOut
 
 }
